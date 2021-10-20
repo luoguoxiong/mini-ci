@@ -1,7 +1,8 @@
 {
   "name": "@tools-list/mini-ci",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "description": "小程序 CI脚手架工具",
+  "private": true,
   "bin": {
     "mini": "bin/minici.js"
   },
@@ -26,7 +27,6 @@
   "homepage": "https://github.com/luoguoxiong/miniprogram-ci#readme",
   "dependencies": {
     "cac": "^6.7.11",
-    "chalk": "^4.1.2",
     "miniprogram-ci": "^1.6.1"
   }
 }
