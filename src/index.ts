@@ -12,7 +12,7 @@ cli
   .option('uploadStorageOptions', '上传云存储')
   .option('uploadContainer', '新建云开发云托管版本');
 
-// 上传
+// 初始化默认的配置文件
 cli.command('[root]')
   .alias('init')
   .action(async(root:string) => {
@@ -81,7 +81,7 @@ cli.command('[root]')
 
 // 上传云存储
 cli.command('[root]')
-  .alias('uploadStorageOptions')
+  .alias('uploadStorage')
   .action(async(root:string) => {
     const config = getConfig(root);
     if(config.uploadStorageOptions){
