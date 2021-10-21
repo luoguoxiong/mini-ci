@@ -75,7 +75,7 @@ export const getConfig = (root:string):UserConfig => {
   }
 };
 /**
- *生成 mini.config.js
+ * 生成 mini.config.js
  * @param  {string} root
  */
 export const createTemplate = (root:string) => {
