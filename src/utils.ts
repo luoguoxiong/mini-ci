@@ -1,9 +1,33 @@
 import fs from 'fs';
 import path from 'path';
 import ci from 'miniprogram-ci';
+import { IInnerUploadOptions } from 'miniprogram-ci/dist/@types/ci/upload';
 import { ICreateProjectOptions } from 'miniprogram-ci/dist/@types/ci/project';
+import { IGetDevSourceMapOption } from 'miniprogram-ci/dist/@types/ci/getDevSourceMap';
+import { IUploadOptions } from 'miniprogram-ci/dist/@types';
+import getTemplate from './template';
 
 export type { ICreateProjectOptions } from 'miniprogram-ci/dist/@types/ci/project';
+
+export type UploadInfo = Omit<IInnerUploadOptions, 'project'>
+
+export type GetDevSourceMapOption = Omit<IGetDevSourceMapOption, 'project'>
+
+export type PreviewInfo = Omit<UploadInfo, 'test'>
+
+export type UploadStaticStorageOptions = Omit<IUploadOptions, 'project'>
+
+/** 云开发上传配置 */
+export interface UploadFunctionOptions {
+    /** 云环境 ID */
+    env:string;
+    /** 云函数名称 */
+    name:string;
+    /** 云函数代码目录 */
+    path:string;
+    /** 是否云端安装依赖 */
+    remoteNpmInstall:boolean;
+}
 
 /** 用户配置文件 */
 export interface UserConfig {
@@ -13,30 +37,16 @@ export interface UserConfig {
     upload?:UploadInfo;
     /** 预览相关配置 */
     preview?:PreviewInfo;
-}
-
-/** 上传相关参数 */
-export interface UploadInfo{
-    /** 版本号信息 */
-    version:string;
-    /** 描述 */
-    desc:string;
-    /** 编译相关配置 */
-    setting?:Record<string, any>;
-    /** 其他上传参数 */
-    otherUploadInfo:Record<string, any>;
-}
-
-/** 预览相关参数 */
-export interface PreviewInfo{
-    /** 版本号信息 */
-    version:string;
-    /** 描述 */
-    desc:string;
-    /** 编译相关配置 */
-    setting?:Record<string, any>;
-    /** 其他预览参数 */
-    otherPreviewInfo:Record<string, any>;
+    /** 最近上传版本的sourceMap配置 */
+    sourceMapOption?:GetDevSourceMapOption;
+    /** 云开发上传配置 */
+    uploadFunctionOptions?:UploadFunctionOptions;
+    /** 上传云开发静态网站配置 */
+    uploadStaticStorageOptions:UploadStaticStorageOptions;
+    /** 上传云存储配置 */
+    uploadStorageOptions:UploadStaticStorageOptions;
+    /** 新建云开发云托管版本配置 */
+    uploadContainer:any;
 }
 
 /**
@@ -45,7 +55,7 @@ export interface PreviewInfo{
  * @returns UserConfig
  */
 export const getConfig = (root:string):UserConfig => {
-  const resolvedPath = path.join(root, 'mini.config.js');
+  const resolvedPath = path.join(root || process.cwd(), 'mini.config.js');
   try {
     let userConfig:UserConfig;
     if(fs.existsSync(resolvedPath)){
@@ -64,6 +74,25 @@ export const getConfig = (root:string):UserConfig => {
     throw e;
   }
 };
+/**
+ *生成 mini.config.js
+ * @param  {string} root
+ */
+export const createTemplate = (root:string) => {
+  const resolvedPath = path.join(root || process.cwd(), 'mini.config.js');
+  if (fs.existsSync(resolvedPath)) {
+    console.log(
+      `\n[${resolvedPath}] 已生成!\n`,
+    );
+  }else{
+    fs.writeFile(resolvedPath, getTemplate(), (err) => {
+      if (err) throw err;
+      console.log(
+        `\n[${resolvedPath}] 已生成!\n`,
+      );
+    });
+  }
+};
 
 /**
  * 上传小程序
@@ -75,9 +104,8 @@ export const uploadProject = async(projectConfig:ICreateProjectOptions, uploadIn
     await ci.upload({
       project: new ci.Project(projectConfig),
       ...uploadInfo,
-      ...uploadInfo.otherUploadInfo,
     });
-    console.log('已上传到微信开发平台');
+    console.log('已更新至微信小程序助手~');
   } catch (error) {
     console.log(JSON.stringify(error));
   }
@@ -90,14 +118,97 @@ export const uploadProject = async(projectConfig:ICreateProjectOptions, uploadIn
  */
 export const previewProject = async(projectConfig:ICreateProjectOptions, previewInfo:PreviewInfo) => {
   try {
-    ci.preview({
+    await ci.preview({
       project: new ci.Project(projectConfig),
       ...previewInfo,
-      ...previewInfo.otherPreviewInfo,
-    }).catch((e) => {
-      console.log(e);
     });
-    console.log('已上传到微信开发平台');
+    console.log('已更新至微信小程序助手~');
+  } catch (error) {
+    console.log('error', JSON.stringify(error));
+  }
+};
+
+/**
+ * 最近上传版本的sourceMap
+ * @param  {ICreateProjectOptions} projectConfig
+ * @param  {GetDevSourceMapOption} sourceMapOption
+ */
+export const getDevSourceMap = async(projectConfig:ICreateProjectOptions, sourceMapOption:GetDevSourceMapOption) => {
+  try {
+    await ci.getDevSourceMap({
+      project: new ci.Project(projectConfig),
+      ...sourceMapOption,
+    });
+    console.log('getDevSourceMap 执行完~');
+  } catch (error) {
+    console.log('error', JSON.stringify(error));
+  }
+};
+
+/**
+ * 上传云开发云函数
+ * @param  {ICreateProjectOptions} projectConfig
+ * @param  {UploadFunctionOptions} uploadFunctionOptions
+ */
+export const uploadFunction = async(projectConfig:ICreateProjectOptions, uploadFunctionOptions:UploadFunctionOptions) => {
+  try {
+    await ci.cloud.uploadFunction({
+      project: new ci.Project(projectConfig),
+      ...uploadFunctionOptions,
+    });
+    console.log('getDevSourceMap 执行完~');
+  } catch (error) {
+    console.log('error', JSON.stringify(error));
+  }
+};
+
+/**
+ * 上传云开发静态网站
+ * @param  {ICreateProjectOptions} projectConfig
+ * @param  {UploadStaticStorageOptions} uploadStaticStorageOptions
+ */
+export const uploadStaticStorage = async(projectConfig:ICreateProjectOptions, uploadStaticStorageOptions:UploadStaticStorageOptions) => {
+  try {
+    await ci.cloud.uploadStaticStorage({
+      project: new ci.Project(projectConfig),
+      ...uploadStaticStorageOptions,
+    });
+    console.log('uploadStaticStorage 执行完~');
+  } catch (error) {
+    console.log('error', JSON.stringify(error));
+  }
+};
+
+
+/**
+ * 上传云存储
+ * @param  {ICreateProjectOptions} projectConfig
+ * @param  {UploadStaticStorageOptions} uploadStorageOptions
+ */
+export const uploadStorage = async(projectConfig:ICreateProjectOptions, uploadStorageOptions:UploadStaticStorageOptions) => {
+  try {
+    await ci.cloud.uploadStorage({
+      project: new ci.Project(projectConfig),
+      ...uploadStorageOptions,
+    });
+    console.log('uploadStorage 执行完~');
+  } catch (error) {
+    console.log('error', JSON.stringify(error));
+  }
+};
+
+/**
+ * 新建云开发云托管版本
+ * @param  {ICreateProjectOptions} projectConfig
+ * @param  {any} uploadContainer
+ */
+export const uploadContainer = async(projectConfig:ICreateProjectOptions, uploadContainer:any) => {
+  try {
+    await ci.cloud.uploadContainer({
+      project: new ci.Project(projectConfig),
+      ...uploadContainer,
+    });
+    console.log('uploadContainer 执行完~');
   } catch (error) {
     console.log('error', JSON.stringify(error));
   }
