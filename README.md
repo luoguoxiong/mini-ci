@@ -1,7 +1,7 @@
 # mini-ci
 基于微信提供的CI方法封装的更加方便、自动化构建的CI工具库。
 
-## Installation
+### Installation
 
 Install `mini-ci` via yarn or npm.
 
@@ -37,7 +37,7 @@ $ mini uploadStorage
 $ mini uploadContainer
 ```
 
-## mini.config.js
+###  mini.config.js
 
 ```js
 const path = require('path');
