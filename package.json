@@ -1,6 +1,6 @@
 {
   "name": "@tools-list/mini-ci",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "小程序 CI脚手架工具",
   "bin": {
     "mini": "bin/minici.js"
@@ -16,14 +16,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/luoguoxiong/miniprogram-ci.git"
+    "url": "git+https://github.com/luoguoxiong/mini-ci.git"
   },
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/luoguoxiong/miniprogram-ci/issues"
+    "url": "https://github.com/luoguoxiong/mini-ci/issues"
   },
-  "homepage": "https://github.com/luoguoxiong/miniprogram-ci#readme",
+  "homepage": "https://github.com/luoguoxiong/mini-ci#readme",
   "dependencies": {
     "cac": "^6.7.11",
     "miniprogram-ci": "^1.3.13"
